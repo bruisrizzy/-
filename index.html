@@ -19,62 +19,285 @@
     html { scroll-padding-top: env(safe-area-inset-top, 0px); }
     body {
       margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: "Times New Roman", Times, serif;
+      overflow-x: hidden;
+    }
+    .hidden { display: none !important; }
+
+    /* Page 1 */
+    #page1 {
+      position: relative;
+      box-sizing: border-box;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #top {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+    h1 { font-size: clamp(2rem, 8vw, 4rem); margin: 0; text-align: center; }
+    #title { cursor: pointer; user-select: none; }
+    .endings { margin: 1rem 0 0; font-size: 1.25rem; text-align: center; }
+
+    /* Sky (ending at the top of the beanstalk) */
+    #sky {
+      position: absolute; top: 10px; left: 0;
+      width: 200px; height: 85px;
+      z-index: 1;
+    }
+    #egg { cursor: pointer; animation: glow 1.6s ease-in-out infinite; }
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 2px #f5c542); }
+      50% { filter: drop-shadow(0 0 10px #f5c542); }
+    }
+
+    /* Beanstalk */
+    #stalkHolder {
+      position: absolute; top: 90px; bottom: 105px;
+      left: 50px; width: 100px;
+      z-index: 0; pointer-events: none;
+    }
+    #stalkHolder svg { display: block; clip-path: inset(0 0 0 0); }
+    #stalkHolder svg.growing { clip-path: inset(100% 0 0 0); }
+    #stalkHolder svg.growing.go { clip-path: inset(0 0 0 0); transition: clip-path 4s ease-out; }
+
+    /* Pot + watering can */
+    #ground { position: relative; z-index: 2; flex: none; width: 100%; height: 174px; }
+    #pot { position: absolute; left: 51px; top: 45px; }
+    #can {
+      position: absolute; left: 140px; top: 59px;
+      width: 100px; height: 75px; cursor: pointer;
+      transform-origin: 50px 37px;
+      transition: transform 0.6s ease;
+    }
+    #can svg { display: block; }
+    #can.pouring { transform: translate(-19px, -46px) rotate(-25deg); }
+    #drops { position: absolute; left: 122px; top: 49px; width: 0; height: 0; z-index: 3; }
+    .drop {
+      position: absolute; width: 5px; height: 9px; border-radius: 50%;
+      background: #5bb6ff; animation: fall 0.5s linear infinite;
+    }
+    @keyframes fall {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(24px); opacity: 0.25; }
+    }
+
+    /* Page 2: the ending page */
+    #page2 {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: var(--bg);
-      color: var(--fg);
-      font-family: "Times New Roman", Times, serif;
     }
-    h1 { font-size: clamp(2rem, 8vw, 4rem); margin: 0; text-align: center; }
-    #title { cursor: pointer; user-select: none; }
-    .found { margin: 1rem 0 0; font-size: 1.25rem; text-align: center; min-height: 1.5em; }
-    .endings { margin: 1rem 0 0; font-size: 1.25rem; text-align: center; }
-    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <!-- Page 1 -->
-  <div id="page1" style="display:flex;flex-direction:column;align-items:center;">
-    <h1 id="title">secrets.</h1>
-    <p class="endings" id="endings">?/? Endings</p>
-    <p class="found" id="found"></p>
+  <!-- Page 1: the start page -->
+  <div id="page1">
+    <div id="sky" class="hidden">
+      <svg width="200" height="85" viewBox="0 0 260 110">
+        <g fill="#eaf3fa">
+          <ellipse cx="80" cy="72" rx="60" ry="30"/>
+          <ellipse cx="130" cy="58" rx="62" ry="40"/>
+          <ellipse cx="188" cy="72" rx="56" ry="30"/>
+        </g>
+        <g id="egg">
+          <ellipse cx="130" cy="38" rx="14" ry="18" fill="#f5c542" stroke="#d9a21b" stroke-width="2"/>
+        </g>
+      </svg>
+    </div>
+
+    <div id="stalkHolder"></div>
+
+    <div id="top">
+      <h1 id="title">secrets.</h1>
+      <p class="endings" id="count1">?/? Endings</p>
+    </div>
+
+    <div id="ground">
+      <svg id="pot" width="98" height="105" viewBox="0 0 140 150">
+        <ellipse cx="70" cy="38" rx="46" ry="8" fill="#4a2f1b"/>
+        <ellipse id="seed" cx="70" cy="33" rx="6" ry="4" fill="#d9b26f" stroke="#a9843f" stroke-width="1"/>
+        <path d="M28 54 L112 54 L100 148 L40 148 Z" fill="#c8683a"/>
+        <rect x="20" y="38" width="100" height="16" rx="4" fill="#b5562d"/>
+      </svg>
+      <div id="can">
+        <svg width="100" height="75" viewBox="0 0 120 90">
+          <path d="M44 30 C44 8 82 8 82 30" fill="none" stroke="#6f93ab" stroke-width="6" stroke-linecap="round"/>
+          <path d="M94 42 C118 42 118 72 94 72" fill="none" stroke="#6f93ab" stroke-width="7" stroke-linecap="round"/>
+          <path d="M32 66 L8 24" stroke="#6f93ab" stroke-width="9" stroke-linecap="round"/>
+          <ellipse cx="7" cy="22" rx="8" ry="4" transform="rotate(-30 7 22)" fill="#4f7389"/>
+          <rect x="30" y="30" width="64" height="50" rx="8" fill="#7ea3bb"/>
+          <rect x="36" y="36" width="10" height="38" rx="5" fill="#a4c3d6" opacity="0.6"/>
+        </svg>
+      </div>
+      <div id="drops"></div>
+    </div>
   </div>
 
-  <!-- Page 2 (shown after the refresh) -->
-  <div id="page2" class="hidden" style="flex-direction:column;align-items:center;">
-    <h1>nothing here yet.</h1>
+  <!-- Page 2: shown when you find an ending -->
+  <div id="page2" class="hidden">
+    <h1 id="msg2">You found 1 ending</h1>
+    <p class="endings" id="count2">1/? Endings</p>
   </div>
 
   <script>
+    // Change this number when you add another ending.
+    var TOTAL_ENDINGS = 2;
+
+    var ENDINGS_KEY = "secrets-endings";
+    var WATER_KEY = "secrets-watered";
+    var SCROLL_KEY = "secrets-scroll";
+    var EXTRA_HEIGHT = 14000; // how far up the beanstalk goes
+
+    try { history.scrollRestoration = "manual"; } catch (e) {}
+
     var page1 = document.getElementById("page1");
     var page2 = document.getElementById("page2");
 
-    function alreadyRefreshed() {
-      try { if (sessionStorage.getItem("refreshed") === "1") return true; } catch (e) {}
-      return location.hash === "#2";
+    // ---------- Saved endings ----------
+    function loadEndings() {
+      try {
+        var saved = JSON.parse(localStorage.getItem(ENDINGS_KEY));
+        if (Array.isArray(saved)) return saved;
+      } catch (e) {}
+      return [];
+    }
+    function saveEndings(list) {
+      try { localStorage.setItem(ENDINGS_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    var endings = loadEndings();
+
+    function countText() {
+      return (endings.length > 0 ? endings.length : "?") + "/" + TOTAL_ENDINGS + " Endings";
+    }
+    document.getElementById("count1").textContent = countText();
+
+    function showEnding(id) {
+      if (endings.indexOf(id) === -1) {
+        endings.push(id);
+        saveEndings(endings);
+      }
+      var n = endings.length;
+      document.getElementById("msg2").textContent = "You found " + n + (n === 1 ? " ending" : " endings");
+      document.getElementById("count2").textContent = countText();
+      page1.classList.add("hidden");
+      page2.classList.remove("hidden");
+      window.scrollTo(0, 0);
+      document.title = "ending " + (endings.indexOf(id) + 1);
     }
 
-    if (alreadyRefreshed()) {
-      page1.classList.add("hidden");
-      page1.style.display = "none";
-      page2.classList.remove("hidden");
-      page2.style.display = "flex";
-      document.title = "...";
-    } else {
-      document.getElementById("title").addEventListener("click", function () {
-        document.getElementById("found").textContent = "You found 1 ending";
-        document.getElementById("endings").textContent = "1/? Endings";
-      });
+    document.getElementById("title").addEventListener("click", function () { showEnding("title"); });
+    document.getElementById("egg").addEventListener("click", function () { showEnding("beanstalk"); });
+
+    // ---------- Beanstalk ----------
+    function stalkSVG(h) {
+      var d = "M50 " + h, y = h, dir = 1;
+      while (y > 0) {
+        var ny = Math.max(0, y - 140);
+        d += " Q " + (50 + dir * 14) + " " + ((y + ny) / 2) + " 50 " + ny;
+        dir = -dir;
+        y = ny;
+      }
+      var leaves = "", side = 1;
+      for (var ly = h - 140; ly > 40; ly -= 200) {
+        var lx = 50 + side * 22;
+        leaves += '<ellipse cx="' + lx + '" cy="' + ly + '" rx="22" ry="8" fill="#3fa34d" transform="rotate(' + (-side * 25) + ' ' + lx + ' ' + ly + ')"/>';
+        side = -side;
+      }
+      return '<svg width="100" height="' + h + '" viewBox="0 0 100 ' + h + '">' +
+        '<path d="' + d + '" fill="none" stroke="#2e8b3a" stroke-width="8" stroke-linecap="round"/>' +
+        leaves + '</svg>';
+    }
+
+    function scrollToBottom() {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    }
+
+    function growStalk(animate) {
+      page1.style.paddingTop = EXTRA_HEIGHT + "px";
+      document.getElementById("sky").classList.remove("hidden");
+      document.getElementById("seed").style.display = "none";
+      var holder = document.getElementById("stalkHolder");
+      var h = page1.offsetHeight - 90 - 105;
+      holder.innerHTML = stalkSVG(h);
+      var svg = holder.firstChild;
+      if (animate) {
+        svg.setAttribute("class", "growing");
+        scrollToBottom();
+        void svg.getBoundingClientRect(); // force layout so the transition runs
+        svg.setAttribute("class", "growing go");
+      }
+    }
+
+    // ---------- Watering ----------
+    var watered = false;
+    try { watered = localStorage.getItem(WATER_KEY) === "1"; } catch (e) {}
+    var busy = false;
+
+    document.getElementById("can").addEventListener("click", function () {
+      if (watered || busy) return;
+      busy = true;
+      watered = true;
+      try { localStorage.setItem(WATER_KEY, "1"); } catch (e) {}
+
+      var can = document.getElementById("can");
+      var drops = document.getElementById("drops");
+      can.classList.add("pouring");
 
       setTimeout(function () {
-        try { sessionStorage.setItem("refreshed", "1"); } catch (e) {}
-        location.hash = "#2";
-        location.reload();
-      }, 5000);
+        for (var i = 0; i < 6; i++) {
+          var dr = document.createElement("div");
+          dr.className = "drop";
+          dr.style.left = (i * 5 - 6) + "px";
+          dr.style.animationDelay = (i * 0.08) + "s";
+          drops.appendChild(dr);
+        }
+      }, 600);
+
+      setTimeout(function () {
+        drops.innerHTML = "";
+        can.classList.remove("pouring");
+      }, 2200);
+
+      setTimeout(function () {
+        growStalk(true);
+        busy = false;
+      }, 2400);
+    });
+
+    // ---------- Keep your place on the stalk across refreshes ----------
+    window.addEventListener("scroll", function () {
+      if (!watered || page1.classList.contains("hidden")) return;
+      var fromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
+      try { sessionStorage.setItem(SCROLL_KEY, String(Math.max(0, Math.round(fromBottom)))); } catch (e) {}
+    });
+
+    if (watered) {
+      growStalk(false);
+      var fromBottom = 0;
+      try {
+        var v = sessionStorage.getItem(SCROLL_KEY);
+        if (v !== null) fromBottom = parseFloat(v) || 0;
+      } catch (e) {}
+      window.scrollTo(0, Math.max(0, document.documentElement.scrollHeight - window.innerHeight - fromBottom));
     }
+
+    // ---------- Refresh (not redirect) after 5 seconds ----------
+    setTimeout(function () {
+      location.reload();
+    }, 5000);
   </script>
 </body>
 </html>
