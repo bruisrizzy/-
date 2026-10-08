@@ -18,10 +18,10 @@
     :root[data-theme="dark"] { --bg: #111111; --fg: #f5f5f5; }
     html { scroll-padding-top: env(safe-area-inset-top, 0px); }
     body {
-      flex-direction: column;
       margin: 0;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       background: var(--bg);
@@ -29,27 +29,52 @@
       font-family: "Times New Roman", Times, serif;
     }
     h1 { font-size: clamp(2rem, 8vw, 4rem); margin: 0; text-align: center; }
-    h1 { cursor: pointer; user-select: none; }
+    #title { cursor: pointer; user-select: none; }
     .found { margin: 1rem 0 0; font-size: 1.25rem; text-align: center; min-height: 1.5em; }
     .endings { margin: 1rem 0 0; font-size: 1.25rem; text-align: center; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <h1 id="title">secrets.</h1>
-  <p class="endings" id="endings">?/? Endings</p>
-  <p class="found" id="found"></p>
+  <!-- Page 1 -->
+  <div id="page1" style="display:flex;flex-direction:column;align-items:center;">
+    <h1 id="title">secrets.</h1>
+    <p class="endings" id="endings">?/? Endings</p>
+    <p class="found" id="found"></p>
+  </div>
+
+  <!-- Page 2 (shown after the refresh) -->
+  <div id="page2" class="hidden" style="flex-direction:column;align-items:center;">
+    <h1>nothing here yet.</h1>
+  </div>
+
   <script>
-    // Change this to wherever you want the page to send people after 5 seconds.
-    var REDIRECT_URL = "https://www.google.com";
+    var page1 = document.getElementById("page1");
+    var page2 = document.getElementById("page2");
 
-    document.getElementById("title").addEventListener("click", function () {
-      document.getElementById("found").textContent = "You found 1 ending";
-      document.getElementById("endings").textContent = "1/? Endings";
-    });
+    function alreadyRefreshed() {
+      try { if (sessionStorage.getItem("refreshed") === "1") return true; } catch (e) {}
+      return location.hash === "#2";
+    }
 
-    setTimeout(function () {
-      window.location.href = REDIRECT_URL;
-    }, 5000);
+    if (alreadyRefreshed()) {
+      page1.classList.add("hidden");
+      page1.style.display = "none";
+      page2.classList.remove("hidden");
+      page2.style.display = "flex";
+      document.title = "...";
+    } else {
+      document.getElementById("title").addEventListener("click", function () {
+        document.getElementById("found").textContent = "You found 1 ending";
+        document.getElementById("endings").textContent = "1/? Endings";
+      });
+
+      setTimeout(function () {
+        try { sessionStorage.setItem("refreshed", "1"); } catch (e) {}
+        location.hash = "#2";
+        location.reload();
+      }, 5000);
+    }
   </script>
 </body>
 </html>
